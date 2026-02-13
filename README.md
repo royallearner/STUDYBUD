@@ -2,7 +2,7 @@
 
 > **Note:** This project is developed as a learning initiative to enhance my skills in Django web development. It is currently under continuous development with new features being added regularly.
 
-![Project Status](https://img.shields.io/badge/status-under%20development-yellow)
+
 ![Django Version](https://img.shields.io/badge/django-6.0-green)
 ![Python Version](https://img.shields.io/badge/python-3.x-blue)
 
@@ -15,15 +15,14 @@
 - [Database Architecture](#database-architecture)
 - [Project Structure](#project-structure)
 - [Application Flow](#application-flow)
-- [Installation Guide](#installation-guide)
-- [API Endpoints](#api-endpoints)
+- [URL Routes](#api-endpoints)
 - [Screenshots](#screenshots)
 - [Configuration](#configuration)
-- [Deployment](#deployment)
+- [Development Concepts Demonstrated](#development-concepts-demonstrated)
 
 ---
 
-## 🎯 Overview
+## Overview
 
 **STUDYBUD** is a community-driven discussion platform built with Django, where users can create and join topic-based discussion rooms. The platform facilitates knowledge sharing and collaboration by enabling users to:
 
@@ -53,6 +52,7 @@ This application demonstrates core Django concepts including authentication, dat
 | Category | Technology | Version | Purpose |
 |----------|-----------|---------|---------|
 | **Framework** | Django | 6.0 | Main web framework |
+| **API** | Django REST Framework | 3.16.1 | RESTful API development |
 | **Database** | PostgreSQL | - | Production database (via psycopg2-binary 2.9.11) |
 | **Storage** | Cloudinary | 1.44.1 | Media file storage |
 | **Server** | Gunicorn | 23.0.0 | WSGI HTTP Server |
@@ -66,20 +66,17 @@ This application demonstrates core Django concepts including authentication, dat
 - **dj-database-url** (3.0.1) - Database configuration via URL
 - **django-cloudinary-storage** (0.3.0) - Cloudinary integration
 - **requests** (2.32.5) - HTTP library
+- **GitPython** (3.1.45) - Git integration
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 ### 1. User Authentication System
-```
-┌──────────────────────────────────┐
-│  ✓ Custom User Registration      │
-│  ✓ Email-based Login             │
-│  ✓ Logout Functionality          │
-│  ✓ Password Validation           │
-└──────────────────────────────────┘
-```
+- **Custom User Registration**: Users can signUp with their mail-id and create a unique username
+- **Email-based Login**: Users can login with their email-id and password
+- **Logout Functionality**
+- **Password Validation**
 
 ### 2. Room Management
 - **Create Rooms**: Users can create discussion rooms with topics
@@ -110,9 +107,13 @@ This application demonstrates core Django concepts including authentication, dat
 - Topic-filtered activities
 - User-specific activity tracking
 
+### 7. REST API
+- Room listing endpoint
+- Individual room details
+
 ---
 
-## 🗄️ Database Architecture
+## Database Architecture
 
 ### Entity Relationship Diagram
 
@@ -160,7 +161,61 @@ erDiagram
     }
 ```
 
-## 📁 Project Structure
+### Model Details
+
+#### 1. User Model (Custom AbstractUser)
+```python
+Fields:
+- username: CharField (inherited)
+- name: CharField(max_length=200, null=True)
+- email: EmailField(unique=True, null=True) - Used for login
+- bio: TextField(null=True)
+- avatar: ImageField(default="avatar.svg", upload_to="images/")
+- password: CharField (inherited)
+
+Authentication: Email-based (USERNAME_FIELD = 'email')
+```
+
+#### 2. Topic Model
+```python
+Fields:
+- id: AutoField (Primary Key)
+- name: CharField(max_length=200)
+
+Purpose: Categorize discussion rooms
+```
+
+#### 3. Room Model
+```python
+Fields:
+- id: AutoField (Primary Key)
+- host: ForeignKey(User, on_delete=SET_NULL)
+- topic: ForeignKey(Topic, on_delete=SET_NULL)
+- name: CharField(max_length=200)
+- description: TextField(blank=True)
+- participants: ManyToManyField(User, related_name='participants')
+- updated: DateTimeField(auto_now=True)
+- created: DateTimeField(auto_now_add=True)
+
+Ordering: Most recently updated first
+```
+
+#### 4. Message Model
+```python
+Fields:
+- id: AutoField (Primary Key)
+- user: ForeignKey(User, on_delete=CASCADE)
+- room: ForeignKey(Room, on_delete=CASCADE)
+- body: TextField
+- updated: DateTimeField(auto_now=True)
+- created: DateTimeField(auto_now_add=True)
+
+Display: First 25 characters + "..."
+```
+
+---
+
+## Project Structure
 
 ```
 STUDYBUD/
@@ -232,7 +287,7 @@ STUDYBUD/
 
 ---
 
-## 🔄 Application Flow
+## Application Flow
 
 ### 1. User Authentication Flow
 
@@ -350,6 +405,14 @@ flowchart TD
 
 ---
 
+## URL Routes
+
+### URL Structure
+```
+Main App: base-url/
+API: base-url/api/
+Admin: base-url/admin/
+```
 
 ### Web Application Routes
 
@@ -369,41 +432,78 @@ flowchart TD
 | GET | `/topics/` | `topicsPage` | Topics listing | No |
 | GET | `/activities/` | `activitiesPage` | Activities feed | No |
 
+### REST API Routes
+
+| Method | Endpoint | View Function | Response | Auth Required |
+|--------|----------|--------------|----------|---------------|
+| GET | `/api/` | `getRoutes` | List of available API routes | No |
+| GET | `/api/rooms/` | `getRooms` | List of all rooms (JSON) | No |
+| GET | `/api/room/<pk>/` | `getRoom` | Single room details (JSON) | No |
+
+### API Response Examples
+
+#### GET /api/rooms/
+```json
+[
+    {
+        "id": 1,
+        "host": 2,
+        "topic": 3,
+        "name": "Django Best Practices",
+        "description": "Discuss Django development patterns",
+        "participants": [2, 5, 8],
+        "updated": "2025-02-13T10:30:00Z",
+        "created": "2025-02-10T14:20:00Z"
+    }
+]
+```
+
+#### GET /api/room/1/
+```json
+{
+    "id": 1,
+    "host": 2,
+    "topic": 3,
+    "name": "Django Best Practices",
+    "description": "Discuss Django development patterns",
+    "participants": [2, 5, 8],
+    "updated": "2025-02-13T10:30:00Z",
+    "created": "2025-02-10T14:20:00Z"
+}
+```
+
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ### Home Page
-![Home Page](placeholder-home-page.png)
+![Home Page](placeholder-images/home-page.png)
 *Main landing page showing available rooms, topics, and recent activities*
 
 ### Room Detail
-![Room Detail](placeholder-room-detail.png)
+![Room Detail](placeholder-images/room-detail.png)
 *Discussion room showing messages and participants*
 
 ### Login/Register
-![Authentication](placeholder-login-register.png)
+![Authentication](placeholder-images/login-register.png)
 *User authentication interface*
 
 ### Create Room
-![Create Room](placeholder-create-room.png)
+![Create Room](placeholder-images/create-room.png)
 *Room creation form with topic selection*
 
 ### User Profile
-![User Profile](placeholder-user-profile.png)
+![User Profile](placeholder-images/user-profile.png)
 *User profile showing rooms and activities*
 
 ### Topics Page
-![Topics](placeholder-topics-page.png)
+![Topics](placeholder-images/topics-page.png)
 *Browse all discussion topics*
 
-### Activity Feed
-![Activity Feed](placeholder-activity-feed.png)
-*Recent messages across all rooms*
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Settings Overview
 
@@ -472,71 +572,7 @@ INSTALLED_APPS = [
 
 ---
 
-## 🚢 Deployment
-
-### Deployment Platform: Render
-
-#### Configuration File: `render.yaml`
-```yaml
-databases:
-  - name: mysitedb
-    plan: free
-    databaseName: mysite
-    user: mysite
-
-services:
-  - type: web
-    plan: free
-    name: mysite
-    runtime: python
-    buildCommand: './build.sh'
-    startCommand: 'python -m gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker'
-```
-
-#### Build Script: `build.sh`
-```bash
-#!/usr/bin/env bash
-set -o errexit
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Collect static files
-python manage.py collectstatic --no-input
-
-# Run database migrations
-python manage.py migrate
-```
-
-### Deployment Checklist
-
-✅ Environment variables configured:
-- SECRET_KEY
-- DATABASE_URL
-- CLOUDINARY credentials
-- RENDER_EXTERNAL_HOSTNAME
-
-✅ Database:
-- PostgreSQL database created
-- Migrations applied
-- Superuser created
-
-✅ Static files:
-- Collected using WhiteNoise
-- Properly configured in settings
-
-✅ Media files:
-- Cloudinary configured
-- Upload permissions set
-
-✅ Security:
-- DEBUG = False in production
-- ALLOWED_HOSTS configured
-- CSRF_TRUSTED_ORIGINS set
-
----
-
-## 📊 Development Concepts Demonstrated
+## Development Concepts Demonstrated
 
 ### Django Concepts Applied
 
@@ -586,7 +622,6 @@ python manage.py migrate
    - Django REST Framework
    - Serializers
    - API views
-   - CORS configuration
 
 10. **Deployment Configuration**
     - Production settings
@@ -596,24 +631,7 @@ python manage.py migrate
 
 ---
 
-## 🎓 Learning Objectives
-
-This project was created to learn and practice:
-
-✓ Django web framework fundamentals
-✓ Database design and relationships
-✓ User authentication and authorization
-✓ CRUD operations implementation
-✓ REST API development
-✓ Frontend-backend integration
-✓ Static and media file management
-✓ Deployment and production configuration
-✓ Third-party integrations (Cloudinary)
-✓ Version control with Git
-
----
-
-## 🔮 Future Development
+## Future Development
 
 *This section will be updated as new features are added*
 
@@ -630,23 +648,18 @@ Potential features under consideration:
 
 ---
 
-## 📝 License
+## License
 
 This is an educational project developed for learning purposes.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 As this is a personal learning project, it is not currently open for contributions. However, feedback and suggestions are welcome!
 
----
-
-## 📧 Contact
-
-*Add your contact information here*
 
 ---
 
-**Last Updated:** February 2025
-**Version:** 1.0.0 (Under Development)
+![Version](https://img.shields.io/badge/Version-1.0.0-blue)
+![Project Status](https://img.shields.io/badge/status-Under%20development-yellow)
