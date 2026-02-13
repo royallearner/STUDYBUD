@@ -1,8 +1,5 @@
 # 📚 STUDYBUD - Community Discussion Platform
 
-> **Note:** This project is developed as a learning initiative to enhance my skills in Django web development. It is currently under continuous development with new features being added regularly.
-
-
 ![Django Version](https://img.shields.io/badge/django-6.0-green)
 ![Python Version](https://img.shields.io/badge/python-3.x-blue)
 
@@ -32,6 +29,8 @@
 - Create and customize user profiles
 - Browse topics and recent activities
 - Track room participants
+
+**Live URL**: [https://mysite-3zm8.onrender.com/](https://mysite-3zm8.onrender.com/)
 
 This application demonstrates core Django concepts including authentication, database relationships, CRUD operations, REST API development, and deployment configuration.
 
@@ -657,6 +656,10 @@ This is an educational project developed for learning purposes.
 ## Contributing
 
 As this is a personal learning project, it is not currently open for contributions. However, feedback and suggestions are welcome!
+
+
+> **Note:** This project is developed as a learning initiative to enhance my skills in Django web development. It is currently under continuous development with new features being added regularly.
+
 
 
 ---
