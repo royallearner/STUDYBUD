@@ -499,76 +499,6 @@ Admin: base-url/admin/
 ![Topics](placeholder-images/topics-page.png)
 *Browse all discussion topics*
 
-
----
-
-## Configuration
-
-### Settings Overview
-
-#### 1. Authentication
-```python
-# Custom user model
-AUTH_USER_MODEL = 'base.User'
-
-# Email-based authentication
-USERNAME_FIELD = 'email'
-```
-
-#### 2. Database
-```python
-# Production: PostgreSQL via environment variable
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
-```
-
-#### 3. Static Files
-```python
-# Static files configuration
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-# WhiteNoise for static file serving
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-```
-
-#### 4. Media Files
-```python
-# Cloudinary for media storage
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-MEDIA_URL = '/images/'
-MEDIA_ROOT = BASE_DIR / 'static/images'
-```
-
-#### 5. CORS Configuration
-```python
-# Allow all origins (development)
-CORS_ALLOW_ALL_ORIGINS = True
-```
-
-#### 6. Installed Apps
-```python
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'cloudinary_storage',      # Media file storage
-    'cloudinary',              # Cloudinary integration
-    'base.apps.BaseConfig',    # Main application
-    'rest_framework',          # REST API
-    'corsheaders',             # CORS handling
-]
-```
-
 ---
 
 ## Development Concepts Demonstrated
@@ -629,7 +559,7 @@ INSTALLED_APPS = [
     - Build scripts
 
 ---
-
+<!-- 
 ## Future Development
 
 *This section will be updated as new features are added*
@@ -644,8 +574,7 @@ Potential features under consideration:
 - Room moderation features
 - User following system
 - Mobile responsive improvements
-
----
+-->
 
 ## License
 
